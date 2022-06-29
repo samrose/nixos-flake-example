@@ -1,12 +1,13 @@
 {
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-22.05";
-
-  outputs = { self, nixpkgs }: {
+  inputs.hydra.url = "github:NixOS/hydra";
+  outputs = { self, nixpkgs, hydra }: {
 
     nixosConfigurations.container = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules =
-        [ ({ pkgs, ... }: {
+        [ hydra.nixosModules.hydraTest
+	    ({ pkgs, ... }: {
             boot.isContainer = true;
 
             # Let 'nixos-version --json' know about the Git revision
@@ -15,7 +16,7 @@
 
             # Network configuration.
             networking.useDHCP = false;
-            networking.firewall.allowedTCPPorts = [ 80 ];
+            networking.firewall.allowedTCPPorts = [ 80 3000 ];
 
             # Enable a web server.
             services.httpd = {
